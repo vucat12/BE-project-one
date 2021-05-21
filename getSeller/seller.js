@@ -9,6 +9,7 @@ var seller = {
     getSeller: function(err, data){
         if (err) throw err;
         else {
+
             this.getRateHouse(data);
 
             this.getAreaPercent(data);
@@ -18,43 +19,6 @@ var seller = {
                 console.log(`Server listening on port ${server.address().port}`);
             });
     }
-    },
-    getLowHouse: function(arrData) {
-        millionHouse = arrData.map(element => {
-            if(element.priceInf.trim().indexOf("triệu") > 0) {
-                return element;
-            }
-        });
-        return millionHouse.filter(x => x);
-    },
-    getHighHouse: function(arrData, price) {
-        billionHouse = arrData.map(element => {
-            if(element.priceInf.trim().indexOf("tỷ") > 0) {
-                if(element.priceInf.trim()[0] >= price)
-                return element;
-            }
-            if(!!!price) {
-                return element;
-            }
-        });
-        return billionHouse.filter(x => x);
-    },
-    getRateHouse: function(arrData) {
-        app.get('/rate-house', (request, response) => {
-            
-            if(request.query.data) {
-                if(request.query.data == 1) {
-                    response.send([...this.getLowHouse(arrData)]);
-                }
-                
-                if(request.query.data > 1) {
-                    response.send([...this.getHighHouse(arrData, request.query.data)]);
-                }
-            }
-            else {
-                response.send([...this.getHighHouse(arrData), ...this.getLowHouse(arrData)]);
-            }
-        });
     },
     getAreaPercent: function(arrData) {
         const areaPercent = arrData.map(el => {
@@ -83,6 +47,66 @@ var seller = {
             response.send(dataPercent);
         });
     },
+    getLowHouse: function(arrData) {
+        millionHouse = arrData.map(element => {
+            if(element.priceInf.trim().indexOf("triệu") > 0) {
+                return element;
+            }
+        });
+        return millionHouse.filter(x => x);
+    },
+    getHighHouse: function(arrData, price) {
+        billionHouse = arrData.map(element => {
+            if(element.priceInf.trim().indexOf("tỷ") > 0) {
+                if(price == 5 && element.priceInf.trim()[0] >= price) return element;
+                if(element.priceInf.trim()[0] >= price-1 && element.priceInf.trim()[0] <= price)
+                return element;
+            }
+            if(!!!price) {
+                return element;
+            }
+        });
+        return billionHouse.filter(x => x);
+    },
+    getRateHouse: function(arrData) {
+        app.get('/rate-house', (request, response) => {
+            let result = [];
+            if(request.query.data) {
+                if(request.query.data == 1) {
+                    result = [...this.getLowHouse(arrData)].filter(element => this.getAreaValue(arrData, request.query.area).includes(element));
+                    response.send(result);
+                }
+                
+                if(request.query.data > 1) {
+                    result = [...this.getHighHouse(arrData, request.query.data)].filter(element => this.getAreaValue(arrData, request.query.area).includes(element));
+                    response.send(result);
+                }
+            }
+            else {
+                result = [...this.getHighHouse(arrData), ...this.getLowHouse(arrData)].filter(element => this.getAreaValue(arrData, request.query.area).includes(element));
+                response.send(result);
+            }
+        });
+    },
+    getAreaValue: function(arrData, areaValue) {
+        if(!!!areaValue) {
+            return arrData;
+        }
+
+        const init = areaValue.indexOf("-");
+        const sizeValue = {
+            low: parseInt(areaValue.substring(0, init)),
+            high: parseInt(areaValue.substring(init+1, areaValue.length))
+        }
+        let areaData = arrData.map(el => {
+            initValue = parseInt(el.areaInf.substring(0, el.areaInf.length - 3).replace('.',''));
+            if(initValue >= sizeValue.low && initValue <= sizeValue.high) {
+                
+                return el;
+            }
+        })
+        return areaData.filter(x => x);
+    }
 
 }
 
