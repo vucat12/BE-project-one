@@ -58,8 +58,8 @@ var seller = {
     getHighHouse: function(arrData, price) {
         billionHouse = arrData.map(element => {
             if(element.priceInf.trim().indexOf("tỷ") > 0) {
-                if(price == 5 && element.priceInf.trim()[0] >= price) return element;
-                if(element.priceInf.trim()[0] >= price-1 && element.priceInf.trim()[0] <= price)
+                if(price == 5 && parseInt(element.priceInf.trim().slice(0,-3).replace(',','.')) >= price) return element;
+                if(parseInt(element.priceInf.trim().slice(0,-3).replace(',','.')) >= price-1 && parseInt(element.priceInf.trim().slice(0,-3).replace(',','.')) <= price)
                 return element;
             }
             if(!!!price) {
@@ -70,20 +70,24 @@ var seller = {
     },
     getRateHouse: function(arrData) {
         app.get('/rate-house', (request, response) => {
+            this.getProvinceValue(arrData, request.query.province);
             let result = [];
             if(request.query.data) {
                 if(request.query.data == 1) {
                     result = [...this.getLowHouse(arrData)].filter(element => this.getAreaValue(arrData, request.query.area).includes(element));
+                    result = result.filter(element => this.getProvinceValue(arrData, request.query.province).includes(element));
                     response.send(result);
                 }
                 
                 if(request.query.data > 1) {
                     result = [...this.getHighHouse(arrData, request.query.data)].filter(element => this.getAreaValue(arrData, request.query.area).includes(element));
+                    result = result.filter(element => this.getProvinceValue(arrData, request.query.province).includes(element));
                     response.send(result);
                 }
             }
             else {
                 result = [...this.getHighHouse(arrData), ...this.getLowHouse(arrData)].filter(element => this.getAreaValue(arrData, request.query.area).includes(element));
+                result = result.filter(element => this.getProvinceValue(arrData, request.query.province).includes(element));
                 response.send(result);
             }
         });
@@ -106,6 +110,15 @@ var seller = {
             }
         })
         return areaData.filter(x => x);
+    },
+    getProvinceValue: function(arrData, provinceValue) {
+        if(!!!provinceValue) return arrData;
+        let data = arrData.map(el => {
+            if(el.addressInf.indexOf(provinceValue) > 0) {
+                return el;
+            }
+        });
+        return data;
     }
 
 }
