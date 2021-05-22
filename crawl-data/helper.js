@@ -4,7 +4,7 @@ const cheerio = require("cheerio");
 const fs = require("fs");
 const { data } = require("cheerio/lib/api/attributes");
  
-const URL = `https://alonhadat.com.vn/nha-dat/can-ban/trang--2.html`;
+const URL = `https://alonhadat.com.vn/nha-dat/can-ban/nha-dat/4/hai-phong/trang--3.html`;
  
 const options = {
   uri: URL,
@@ -37,6 +37,7 @@ const options = {
     const areaPage = chaper.find('.content-item').find('.text').find('.square-direct').find('.ct_dt');
     const addressPage = chaper.find('.content-item').find('.text').find('.price-dis').find('.ct_dis');
     const descriptionPage = chaper.find('.content-item').find('.text').find('.ct_brief');
+    const linkPage = chaper.find('.content-item').find('.thumbnail').find("a");
 
     for (let j = 0; j < titlePage.length; j++) {
       const getTitle = $(titlePage[j]).text();
@@ -45,6 +46,7 @@ const options = {
       const getArea = $(areaPage[j]).text();
       const getAddress = $(addressPage[j]).text();
       const getDescription = $(descriptionPage[j]).text();
+      const getLink = $(linkPage[j]).attr('href');
 
       data.push({
         titleInf: getTitle,
@@ -53,9 +55,10 @@ const options = {
         areaInf: getArea.substring(11),
         addressInf: getAddress,
         descriptionInf: getDescription.substring(0, (getDescription.length - 20)),
+        linkPage: "https://alonhadat.com.vn" + getLink,
       })
     }
-  fs.writeFileSync('data1.json', JSON.stringify(data))
+  fs.writeFileSync('DataCanBan/data15.json', JSON.stringify(data))
   }
   // Lưu dữ liệu về máy
 
