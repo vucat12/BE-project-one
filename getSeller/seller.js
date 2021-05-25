@@ -42,9 +42,11 @@ var seller = {
             if(element >= 800 && element <= 1000) dataPercent[11]++;
             if(element >= 1000) dataPercent[12]++;
         });
+
+        sumHouses = dataPercent;
         dataPercent = dataPercent.map(el => (el*100)/ arrData.length);
-        app.get('/area-percent', (request, response) => {
-            response.send(dataPercent);
+        app.get('/seller/area-percent', (request, response) => {
+            response.send({dataPercent: dataPercent, sumHouses: sumHouses});
         });
     },
     getLowHouse: function(arrData) {
@@ -69,7 +71,7 @@ var seller = {
         return billionHouse.filter(x => x);
     },
     getRateHouse: function(arrData) {
-        app.get('/rate-house', (request, response) => {
+        app.get('/seller/rate-house', (request, response) => {
             this.getProvinceValue(arrData, request.query.province);
             let result = [];
             if(request.query.data) {
