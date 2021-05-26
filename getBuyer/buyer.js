@@ -1,7 +1,7 @@
 var dataApp = require('../export-sever/exportSever.js')
 
-var seller = {
-    getSeller: function(err, data){
+var buyer = {
+    getBuyer: function(err, data){
         if (err) throw err;
         else {
             this.getRateHouse(data);
@@ -33,7 +33,7 @@ var seller = {
 
         sumHouses = dataPercent;
         dataPercent = dataPercent.map(el => (el*100)/ arrData.length);
-        dataApp.get('/seller/area-percent', (request, response) => {
+        dataApp.get('/buyer/area-percent', (request, response) => {
             response.send({dataPercent: dataPercent, sumHouses: sumHouses});
         });
     },
@@ -59,7 +59,7 @@ var seller = {
         return billionHouse.filter(x => x);
     },
     getRateHouse: function(arrData) {
-        dataApp.get('/seller/rate-house', (request, response) => {
+        dataApp.get('/buyer/rate-house', (request, response) => {
             this.getProvinceValue(arrData, request.query.province);
             let result = [];
             if(request.query.data) {
@@ -113,4 +113,4 @@ var seller = {
 
 }
 
-module.exports = seller;
+module.exports = buyer;
