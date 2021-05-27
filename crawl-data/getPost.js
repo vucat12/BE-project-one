@@ -37,6 +37,7 @@ const options = {
         const areaPage = chaper.find('.moreinfor').find('.square').find('.value');
         const addressPage = chaper.find('.address').find('.value');
         const moreinfPage = chaper.find('.moreinfor1').find('.infor').find("tr");
+        const moreinfPageDetail = chaper.find('.moreinfor1').find('.infor').find("tr").find("td");
         const imagePage = chaper.find('.image-list').find("img");
 
 
@@ -49,17 +50,11 @@ const options = {
             const getAddress = $(addressPage[j]).text().trim();
             //const getMoreInf = $(moreinfPage[j]).text().trim();
             let getMoreInf = [];
-
-            for (let m = 0; m < moreinfPage.length; m++) {
-                getMoreInf[m] = $(moreinfPage[m]).text().trim();
+            for (let n = 0; n < moreinfPageDetail.length; n++) {
+                getMoreInf[n] = $(moreinfPageDetail[n]).text().trim();
             }
 
-            //     for (let n = 0; n < 4; n++) {
-            //         getMoreInf[m][n] = $(moreinfPage[m]).find("td").text().trim();
-            //     }
-            //     getMoreInf[m][5] =$(moreinfPage[m]).find("td").find("img").attr('src');
-            // }
-            //
+
             let getImage = [];
             for (let k = 0; k < imagePage.length; k++) {
                 getImage[k] = "https://alonhadat.com.vn" + $(imagePage[k]).attr('src');
