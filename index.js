@@ -5,6 +5,8 @@ var buyer = require('./getBuyer/buyer.js')
 var lessor = require('./getLessor/lessor.js')
 var tenant = require('./getTenant/tenant.js')
 var dataApp = require('./export-sever/exportSever.js')
+var postDetail = require('./crawl-data/getPost.js')
+
 const port = 3002;
 
 MongoClient.connect(url, function(err, db) {
@@ -15,6 +17,8 @@ dbo.collection("CanBan").find({}).toArray((err, res) => seller.getSeller(err,res
 dbo.collection("CanMua").find({}).toArray((err, res) => buyer.getBuyer(err,res));
 dbo.collection("ChoThue").find({}).toArray((err, res) => lessor.getLessor(err,res));
 dbo.collection("CanThue").find({}).toArray((err, res) => tenant.getTenant(err,res));
+
+postDetail.getPostDetail();
 
 const server = dataApp.listen(port, (error) => {
     if (error) return console.log(`Error: ${error}`);
