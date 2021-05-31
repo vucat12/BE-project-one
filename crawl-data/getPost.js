@@ -75,8 +75,7 @@ postDetail = {
                 })
             }
             result = data;
-console.log(result);
-response.send(result)
+            response.send(result)
           
         }
         // Lưu dữ liệu về máy
