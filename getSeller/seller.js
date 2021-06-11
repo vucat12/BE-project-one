@@ -31,10 +31,10 @@ var seller = {
             if(element >= 1000) dataPercent[12]++;
         });
 
-        sumHouses = dataPercent;
+        const sumHousesSeller = dataPercent;
         dataPercent = dataPercent.map(el => (el*100)/ arrData.length);
         dataApp.get('/seller/area-percent', (request, response) => {
-            response.send({dataPercent: dataPercent, sumHouses: sumHouses});
+            response.send({dataPercent: dataPercent, sumHouses: sumHousesSeller});
         });
     },
     getLowHouse: function(arrData) {

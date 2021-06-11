@@ -32,10 +32,10 @@ var lessor = {
             if (element >= 1000) dataPercent[12]++;
         });
 
-        sumHouses = dataPercent;
+        const sumHousesLessor = dataPercent;
         dataPercent = dataPercent.map(el => (el * 100) / arrData.length);
         dataApp.get('/lessor/area-percent', (request, response) => {
-            response.send({ dataPercent: dataPercent, sumHouses: sumHouses });
+            response.send({ dataPercent: dataPercent, sumHouses: sumHousesLessor });
         });
     },
     getLowHouse: function(arrData) {

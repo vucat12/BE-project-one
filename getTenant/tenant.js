@@ -32,10 +32,10 @@ var tenant = {
             if (element >= 1000) dataPercent[12]++;
         });
 
-        sumHouses = dataPercent;
+        const sumHousesTenant = dataPercent;
         dataPercent = dataPercent.map(el => (el * 100) / arrData.length);
         dataApp.get('/tenant/area-percent', (request, response) => {
-            response.send({ dataPercent: dataPercent, sumHouses: sumHouses });
+            response.send({ dataPercent: dataPercent, sumHouses: sumHousesTenant });
         });
     },
     getLowHouse: function(arrData) {
