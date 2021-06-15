@@ -11,28 +11,28 @@ module.exports = function SignUp() {
 
         var username = req.body.username;
         var password = req.body.password;
-    
+        var email = req.body.email;
+
         AccountModel.findOne({
             username: username
         })
             .then(data => {
                 if (data) {
-                    res.json('user da ton tai')
+                    res.status(500).json('Tên tài khoản đã tồn tại')
                 }
                 else {
+                    res.json('Tạo tài khoản thành công')
                     return AccountModel.create(
                         {
                             username: username,
                             password: password,
+                            email: email,
                         }
                     )
                 }
             })
-            .then(data => {
-                res.json('Tao tai khoan thanh cong')
-            })
             .catch(err => {
-                res.status(500).json('Tao tai khoan that bai')
+                res.status(500).json('Tạo tài khoản thất bại')
             })
     })
 }

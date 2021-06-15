@@ -21,12 +21,12 @@ module.exports = function SignIn() {
                 res.json(token)
             }
             else {
-                res.status(400).json('Dang nhap khong thanh cong')
+                res.status(400).json('Đăng nhập thất bại')
             }
         })
         .catch(err => {
             console.log(err);
-            res.status(500).json('Loi server')
+            res.status(500).json('Lỗi server')
         })
         })
 }
