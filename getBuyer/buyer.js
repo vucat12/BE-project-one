@@ -60,24 +60,26 @@ var buyer = {
     },
     getRateHouse: function(arrData) {
         dataApp.get('/buyer/rate-house', (request, response) => {
-            this.getProvinceValue(arrData, request.query.province);
             let result = [];
             if(request.query.data) {
                 if(request.query.data == 1) {
                     result = [...this.getLowHouse(arrData)].filter(element => this.getAreaValue(arrData, request.query.area).includes(element));
                     result = result.filter(element => this.getProvinceValue(arrData, request.query.province).includes(element));
+                    result = result.filter(element => this.getDictrictValue(arrData, request.query.district).includes(element));
                     response.send(result);
                 }
                 
                 if(request.query.data > 1) {
                     result = [...this.getHighHouse(arrData, request.query.data)].filter(element => this.getAreaValue(arrData, request.query.area).includes(element));
                     result = result.filter(element => this.getProvinceValue(arrData, request.query.province).includes(element));
+                    result = result.filter(element => this.getDictrictValue(arrData, request.query.district).includes(element));
                     response.send(result);
                 }
             }
             else {
                 result = [...this.getHighHouse(arrData), ...this.getLowHouse(arrData)].filter(element => this.getAreaValue(arrData, request.query.area).includes(element));
                 result = result.filter(element => this.getProvinceValue(arrData, request.query.province).includes(element));
+                result = result.filter(element => this.getDictrictValue(arrData, request.query.district).includes(element));
                 response.send(result);
             }
         });
@@ -95,7 +97,6 @@ var buyer = {
         let areaData = arrData.map(el => {
             initValue = parseInt(el.areaInf.substring(0, el.areaInf.length - 3).replace('.',''));
             if(initValue >= sizeValue.low && initValue <= sizeValue.high) {
-                
                 return el;
             }
         })
@@ -109,8 +110,16 @@ var buyer = {
             }
         });
         return data;
+    },
+    getDictrictValue: function(arrData, dictrictValue) {
+        if(!!!dictrictValue) return arrData;
+        let data = arrData.map(el => {
+            if(el.addressInf.indexOf(dictrictValue)>0) {
+                return el;
+            }
+        })
+        return data;
     }
-
 }
 
 module.exports = buyer;
