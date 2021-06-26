@@ -35,6 +35,7 @@ const options = {
     const namePage = chaper.find('.content').find('.title').find("a");
     const addressPage = chaper.find('.address');
     const descriptionPage = chaper.find('.brief');
+    const linkPage = chaper.find('.image').find("a");
     
     for (let j = 0; j < imagePage.length; j++) {
 
@@ -42,15 +43,18 @@ const options = {
       const getName = $(namePage[j]).text().trim();
       const getAddress = $(addressPage[j]).text().trim();
       const getDescription = $(descriptionPage[j]).text().trim();
+      const getLink = $(linkPage[j]).attr('href');
+
 
       data.push({
         imageInf: "https://alonhadat.com.vn" + getImage,
         nameInf: getName,
         addressInf: getAddress,
         description: getDescription,
+        linkPage: "https://alonhadat.com.vn" + getLink,
       })
     }
-    fs.writeFileSync('./crawl-json/data.json', JSON.stringify(data))
+    fs.writeFileSync('data.json', JSON.stringify(data))
   }
   // Lưu dữ liệu về máy
 

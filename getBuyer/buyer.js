@@ -48,8 +48,8 @@ var buyer = {
     getHighHouse: function(arrData, price) {
         billionHouse = arrData.map(element => {
             if(element.priceInf.trim().indexOf("tỷ") > 0) {
-                if(price == 5 && parseInt(element.priceInf.trim().slice(0,-3).replace(',','.')) >= price) return element;
-                if(parseInt(element.priceInf.trim().slice(0,-3).replace(',','.')) >= price-1 && parseInt(element.priceInf.trim().slice(0,-3).replace(',','.')) <= price)
+                if(price == 5 && element.priceInf.trim().slice(0,-3).replace(',','.') >= price) return element;
+                if(element.priceInf.trim().slice(0,-3).replace(',','.') >= price-1 && element.priceInf.trim().slice(0,-3).replace(',','.') <= price && parseInt(element.priceInf.trim().slice(0,-3).replace(',','.')) < 10)
                 return element;
             }
             if(!!!price) {

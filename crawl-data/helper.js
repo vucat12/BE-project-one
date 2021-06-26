@@ -58,7 +58,7 @@ const options = {
         linkPage: "https://alonhadat.com.vn" + getLink,
       })
     }
-  fs.writeFileSync('DataCanBan/data15.json', JSON.stringify(data))
+  fs.writeFileSync('data.json', JSON.stringify(data))
   }
   // Lưu dữ liệu về máy
 
