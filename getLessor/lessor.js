@@ -6,10 +6,12 @@ var lessor = {
         else {
             this.getRateHouse(data);
             this.getAreaPercent(data);           
+            this.getValueByProvince(data);
+            this.getRateArea(data);
         }
     },
 
-    getAreaPercent: function (arrData) {
+    countData: function (arrData) {
         const areaPercent = arrData.map(el => {
             element = el.areaInf.substring(0, el.areaInf.length - 3);
             return element.replace('.', '');
@@ -34,10 +36,15 @@ var lessor = {
 
         const sumHousesLessor = dataPercent;
         dataPercent = dataPercent.map(el => (el * 100) / arrData.length);
+        return { dataPercent: dataPercent, sumHouses: sumHousesLessor }
+    },
+
+    getAreaPercent: function(arr) {
         dataApp.get('/lessor/area-percent', (request, response) => {
-            response.send({ dataPercent: dataPercent, sumHouses: sumHousesLessor });
+            response.send(this.countData(arr));
         });
     },
+
     getLowHouse: function(arrData) {
         millionHouse = arrData.map(element => {
             if(element.priceInf.trim().indexOf("triệu") > 0) {
@@ -49,11 +56,11 @@ var lessor = {
     getHighHouse: function(arrData, price) {
         billionHouse = arrData.map(element => {
             if(element.priceInf.trim().indexOf("tỷ") > 0) {
+                if(!price) {
+                    return element;
+                }
                 if(price == 5 && parseInt(element.priceInf.trim().slice(0,-3).replace(',','.')) >= price) return element;
                 if(element.priceInf.trim().slice(0,-3).replace(',','.') >= price-1 && element.priceInf.trim().slice(0,-3).replace(',','.') <= price && parseInt(element.priceInf.trim().slice(0,-3).replace(',','.')) < 10)
-                return element;
-            }
-            if(!!!price) {
                 return element;
             }
         });
@@ -78,7 +85,7 @@ var lessor = {
                 }
             }
             else {
-                result = [...this.getHighHouse(arrData), ...this.getLowHouse(arrData)].filter(element => this.getAreaValue(arrData, request.query.area).includes(element));
+                result = [...this.getHighHouse(arrData,0), ...this.getLowHouse(arrData)].filter(element => this.getAreaValue(arrData, request.query.area).includes(element));
                 result = result.filter(element => this.getProvinceValue(arrData, request.query.province).includes(element));
                 result = result.filter(element => this.getDictrictValue(arrData, request.query.district).includes(element));
                 response.send(result);
@@ -121,6 +128,38 @@ var lessor = {
             }
         })
         return data;
+    },
+    getValueByProvince: function(arrData) {
+        dataApp.get('/lessor/value-search-province', (request, response) => {
+            const init = this.getProvinceValue(arrData, request.query.province).filter(x => x);
+            const countData = this.countData(init);
+            response.send(countData)
+        })
+    },
+    countRateArea: function(arrData) {
+        let dataPercent = Array.apply(null, Array(5)).map(Number.prototype.valueOf,0);
+        dataPercent.fill(0);
+        dataPercent[0] = this.getLowHouse(arrData).length;
+
+        arrData.map(element => {
+            if(element.priceInf.trim().indexOf("tỷ") > 0) {
+                const init = parseFloat(element.priceInf.trim().slice(0,-3).replace(',','.'));
+                if(init>=1 && init<=2) dataPercent[1]++;
+                else if(init>=2 && init<=3) dataPercent[2]++;
+                else if(init>=3 && init<=4) dataPercent[3]++;
+                else if(init>=4) dataPercent[4]++;
+            }
+        });
+        const sumArea = dataPercent;
+        dataPercent = dataPercent.map(el => (el*100)/ arrData.length);
+        return { dataPercent: dataPercent, sumHouses: sumArea }
+    },
+    getRateArea: function(arrData) {
+        dataApp.get('/lessor/price-data', (request, response) => {
+            const init = this.getProvinceValue(arrData, request.query.province).filter(x => x);
+            const countData = this.countRateArea(init);
+            response.send(countData)
+        });
     }
 }
 module.exports = lessor;
