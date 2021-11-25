@@ -4,7 +4,7 @@ const cheerio = require("cheerio");
 const fs = require("fs");
 const { data } = require("cheerio/lib/api/attributes");
  
-const URL = `https://alonhadat.com.vn/nha-dat/can-ban/nha-dat/4/hai-phong/trang--3.html`;
+const URL = `https://alonhadat.com.vn/nha-dat/can-ban/nha-dat/2/ho-chi-minh.html`;
  
 const options = {
   uri: URL,
@@ -58,7 +58,7 @@ const options = {
         linkPage: "https://alonhadat.com.vn" + getLink,
       })
     }
-  fs.writeFileSync('data.json', JSON.stringify(data))
+  fs.writeFileSync('./crawl-data-develop/data.json', JSON.stringify(data))
   }
   // Lưu dữ liệu về máy
 

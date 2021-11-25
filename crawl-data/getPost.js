@@ -6,7 +6,6 @@ const { data } = require("cheerio/lib/api/attributes");
 
 postDetail = {
     getPostDetail: function(url) {
-
     dataApp.get('/get-data-post', (request, response) => {
     let result = [];
     const URL = request.query.link;

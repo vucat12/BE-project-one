@@ -7,8 +7,9 @@ var seller = {
             this.getRateHouse(data);
             this.getAreaPercent(data);
             this.getValueByProvince(data);
-            this.getRateArea(data)
-    }
+            this.getRateArea(data);
+            this.identicalPrice(data)
+        }
     },
     countData: function(arrData) {
         const areaPercent = arrData.map(el => {
@@ -159,7 +160,13 @@ var seller = {
             const countData = this.countRateArea(init);
             response.send(countData)
         });
-    }
+    },
+
+    identicalPrice: function(arrData) {
+        dataApp.get('/seller/identical-price', (request, response) => {
+            response.send(arrData.filter(el => el))
+        });
+    },
 }
 
 module.exports = seller;

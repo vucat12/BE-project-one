@@ -13,7 +13,7 @@ const port = 3002;
 
 MongoClient.connect(url, function(err, db) {
 if (err) throw err;
-var dbo = db.db("DoAn1");
+var dbo = db.db("DoAn2");
 
 signIn();
 signUp();
