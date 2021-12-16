@@ -162,11 +162,51 @@ var seller = {
         });
     },
 
+
+
     identicalPrice: function(arrData) {
         dataApp.get('/seller/identical-price', (request, response) => {
-            response.send(arrData.filter(el => el))
+            //25/10  1/11  8/11  15/11  19/11
+            const arrFilteredProvince_Week1 = this.getRequestByDateAndProvince(arrData, "25/10/2021", request.query.province)
+            const averageValue_Week1 =  this.filterDataPircePerArea(arrFilteredProvince_Week1);
+
+            const arrFilteredProvince_Week2 = this.getRequestByDateAndProvince(arrData, "1/11/2021", request.query.province)
+            const averageValue_Week2 =  this.filterDataPircePerArea(arrFilteredProvince_Week2);
+
+            const arrFilteredProvince_Week3 = this.getRequestByDateAndProvince(arrData, "8/11/2021", request.query.province)
+            const averageValue_Week3 =  this.filterDataPircePerArea(arrFilteredProvince_Week3);
+            
+            const arrFilteredProvince_Week4 = this.getRequestByDateAndProvince(arrData, "15/11/2021", request.query.province)
+            const averageValue_Week4 =  this.filterDataPircePerArea(arrFilteredProvince_Week4);
+            
+            const arrFilteredProvince_Week5 = this.getRequestByDateAndProvince(arrData, "19/11/2021", request.query.province)
+            const averageValue_Week5 =  this.filterDataPircePerArea(arrFilteredProvince_Week5);
+
+            const arrResult = [averageValue_Week1, averageValue_Week2, averageValue_Week3, averageValue_Week4, averageValue_Week5]
+            response.send([...arrResult, this.futurePrice(arrResult)]);
         });
     },
+    getRequestByDateAndProvince(rootValue, date, province) {
+        return result = rootValue.filter(el => el.postDate == date && el.addressInf.indexOf(province) > 0)
+    },
+    filterDataPircePerArea(dataFilter) {
+        let pricePerArea = dataFilter.map(el => {
+            if(el.priceInf.trim().indexOf("triệu / m2") > 0) {
+                return parseFloat(Number(el.priceInf.trim().slice(0, -11).replace(',', '.')).toFixed(1));
+            }
+            else if(el.priceInf.trim().indexOf("tỷ") > 0) {
+                const price = parseFloat(Number(el.priceInf.trim().slice(0, -3).replace(',', '.')).toFixed(1));
+                const area = Number(el.areaInf.trim().slice(0, -3).replace('.',''));
+                return (price*1000)/area;
+            }
+        }).filter(el => el);
+        const average = pricePerArea.reduce((p, c) => p + c, 0) / pricePerArea.length;
+        return average.toFixed(1);
+    },
+    futurePrice(arrResult) {
+        return (arrResult.reduce((p, c) => Number(p) + Number(c), 0) / arrResult.length).toFixed(1)
+    },
+    
 }
 
 module.exports = seller;
