@@ -8,6 +8,7 @@ var lessor = {
             this.getAreaPercent(data);           
             this.getValueByProvince(data);
             this.getRateArea(data);
+            this.identicalPrice(data)
         }
     },
 
@@ -160,6 +161,48 @@ var lessor = {
             const countData = this.countRateArea(init);
             response.send(countData)
         });
-    }
+    },
+
+    identicalPrice: function(arrData) {
+        dataApp.get('/lessor/identical-price', (request, response) => {
+            //25/10  1/11  8/11  15/11  19/11
+            const arrFilteredProvince_Week1 = this.getRequestByDateAndProvince(arrData, "25/10/2021", request.query.province)
+            const averageValue_Week1 =  this.filterDataPircePerArea(arrFilteredProvince_Week1);
+
+            const arrFilteredProvince_Week2 = this.getRequestByDateAndProvince(arrData, "1/11/2021", request.query.province)
+            const averageValue_Week2 =  this.filterDataPircePerArea(arrFilteredProvince_Week2);
+
+            const arrFilteredProvince_Week3 = this.getRequestByDateAndProvince(arrData, "8/11/2021", request.query.province)
+            const averageValue_Week3 =  this.filterDataPircePerArea(arrFilteredProvince_Week3);
+            
+            const arrFilteredProvince_Week4 = this.getRequestByDateAndProvince(arrData, "15/11/2021", request.query.province)
+            const averageValue_Week4 =  this.filterDataPircePerArea(arrFilteredProvince_Week4);
+            
+            const arrFilteredProvince_Week5 = this.getRequestByDateAndProvince(arrData, "19/11/2021", request.query.province)
+            const averageValue_Week5 =  this.filterDataPircePerArea(arrFilteredProvince_Week5);
+
+            const arrResult = [averageValue_Week1, averageValue_Week2, averageValue_Week3, averageValue_Week4, averageValue_Week5]
+            response.send([...arrResult, this.futurePrice(arrResult)]);
+        });
+    },
+    getRequestByDateAndProvince(rootValue, date, province) {
+        return result = rootValue.filter(el => el.postDate == date && el.addressInf.indexOf(province) > 0)
+    },
+    filterDataPircePerArea(dataFilter) {
+        let pricePerArea = dataFilter.map(el => {
+            if(el.priceInf.trim().indexOf("triệu") > 0) {
+                const priceTotal = parseFloat(Number(el.priceInf.trim().slice(0, -13).replace(',', '.')));
+                const areaTotal = parseInt(el.areaInf.substring(0, el.areaInf.length - 3).replace('.',''))
+                
+                return (priceTotal * 1000)/areaTotal;
+            }
+        }).filter(el => el);
+        const average = pricePerArea.reduce((p, c) => p + c, 0) / pricePerArea.length;
+        return average.toFixed(1);
+    },
+    futurePrice(arrResult) {
+        return (arrResult.reduce((p, c) => Number(p) + Number(c), 0) / arrResult.length).toFixed(1)
+    },
+    
 }
 module.exports = lessor;

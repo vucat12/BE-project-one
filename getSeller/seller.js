@@ -162,8 +162,6 @@ var seller = {
         });
     },
 
-
-
     identicalPrice: function(arrData) {
         dataApp.get('/seller/identical-price', (request, response) => {
             //25/10  1/11  8/11  15/11  19/11
