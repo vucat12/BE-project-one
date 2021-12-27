@@ -8,7 +8,7 @@ var seller = {
             this.getAreaPercent(data);
             this.getValueByProvince(data);
             this.getRateArea(data);
-            this.identicalPrice(data)
+            this.identicalPrice(data);
         }
     },
     countData: function(arrData) {
@@ -165,27 +165,31 @@ var seller = {
     identicalPrice: function(arrData) {
         dataApp.get('/seller/identical-price', (request, response) => {
             //25/10  1/11  8/11  15/11  19/11
-            const arrFilteredProvince_Week1 = this.getRequestByDateAndProvince(arrData, "25/10/2021", request.query.province)
+            const arrFilteredProvince_Week1 = this.getRequestByDateAndProvince(arrData, "25/10/2021", request.query.province, request.query.district)
             const averageValue_Week1 =  this.filterDataPircePerArea(arrFilteredProvince_Week1);
 
-            const arrFilteredProvince_Week2 = this.getRequestByDateAndProvince(arrData, "1/11/2021", request.query.province)
+            const arrFilteredProvince_Week2 = this.getRequestByDateAndProvince(arrData, "1/11/2021", request.query.province, request.query.district)
             const averageValue_Week2 =  this.filterDataPircePerArea(arrFilteredProvince_Week2);
 
-            const arrFilteredProvince_Week3 = this.getRequestByDateAndProvince(arrData, "8/11/2021", request.query.province)
+            const arrFilteredProvince_Week3 = this.getRequestByDateAndProvince(arrData, "8/11/2021", request.query.province, request.query.district)
             const averageValue_Week3 =  this.filterDataPircePerArea(arrFilteredProvince_Week3);
             
-            const arrFilteredProvince_Week4 = this.getRequestByDateAndProvince(arrData, "15/11/2021", request.query.province)
+            const arrFilteredProvince_Week4 = this.getRequestByDateAndProvince(arrData, "15/11/2021", request.query.province, request.query.district)
             const averageValue_Week4 =  this.filterDataPircePerArea(arrFilteredProvince_Week4);
             
-            const arrFilteredProvince_Week5 = this.getRequestByDateAndProvince(arrData, "19/11/2021", request.query.province)
+            const arrFilteredProvince_Week5 = this.getRequestByDateAndProvince(arrData, "19/11/2021", request.query.province, request.query.district)
             const averageValue_Week5 =  this.filterDataPircePerArea(arrFilteredProvince_Week5);
 
             const arrResult = [averageValue_Week1, averageValue_Week2, averageValue_Week3, averageValue_Week4, averageValue_Week5]
             response.send([...arrResult, this.futurePrice(arrResult)]);
         });
     },
-    getRequestByDateAndProvince(rootValue, date, province) {
-        return result = rootValue.filter(el => el.postDate == date && el.addressInf.indexOf(province) > 0)
+    getRequestByDateAndProvince(rootValue, date, province, district) {
+        if(district) {
+            return result = rootValue.filter(el => el.postDate == date && el.addressInf.indexOf(province) > 0 && el.addressInf.indexOf(district) > 0) 
+        } else {
+            return result = rootValue.filter(el => el.postDate == date && el.addressInf.indexOf(province) > 0)
+        }
     },
     filterDataPircePerArea(dataFilter) {
         let pricePerArea = dataFilter.map(el => {
