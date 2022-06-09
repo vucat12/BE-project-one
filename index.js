@@ -10,6 +10,10 @@ var signIn = require('./Account/Sign-in');
 var signUp = require('./Account/Sign-up');
 var thirdParty = require('./third-party/callThirdParty.js');
 
+var buyerDetail = require('./getBuyer/buyerDetail.js')
+var sellerDetail = require('./getSeller/sellerDetail.js')
+var tenantDetail = require('./getTenant/tenantDetail.js')
+
 const port = 3002;
 
 MongoClient.connect(url, function (err, db) {
@@ -20,10 +24,19 @@ MongoClient.connect(url, function (err, db) {
 
     signIn();
     signUp();
-    dbo.collection("CanBan").find({}).toArray((err, res) => seller.getSeller(err, res));
-    dbo.collection("CanMua").find({}).toArray((err, res) => buyer.getBuyer(err, res));
+    dbo.collection("CanBan").find({}).toArray((err, res) => {
+        seller.getSeller(err, res)
+        sellerDetail.getSellerDetail(err, res)
+    });
+    dbo.collection("CanMua").find({}).toArray((err, res) => {
+        buyer.getBuyer(err, res);
+        buyerDetail.getBuyerDetail(err, res);
+    });
     dbo.collection("ChoThue").find({}).toArray((err, res) => lessor.getLessor(err, res));
-    dbo.collection("CanThue").find({}).toArray((err, res) => tenant.getTenant(err, res));
+    dbo.collection("CanThue").find({}).toArray((err, res) => {
+        tenant.getTenant(err, res)
+        tenantDetail.getTenantDetail(err, res)
+    });
 
     postDetail.getPostDetail();
 

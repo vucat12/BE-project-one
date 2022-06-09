@@ -5,7 +5,7 @@ var lessor = {
         if (err) throw err;
         else {
             this.getRateHouse(data);
-            this.getAreaPercent(data);           
+            this.getAreaPercent(data);
             this.getValueByProvince(data);
             this.getRateArea(data);
             this.identicalPrice(data)
@@ -40,45 +40,45 @@ var lessor = {
         return { dataPercent: dataPercent, sumHouses: sumHousesLessor }
     },
 
-    getAreaPercent: function(arr) {
+    getAreaPercent: function (arr) {
         dataApp.get('/lessor/area-percent', (request, response) => {
             response.send(this.countData(arr));
         });
     },
 
-    getLowHouse: function(arrData) {
+    getLowHouse: function (arrData) {
         millionHouse = arrData.map(element => {
-            if(element.priceInf.trim().indexOf("triệu") > 0) {
+            if (element.priceInf.trim().indexOf("triệu") > 0) {
                 return element;
             }
         });
         return millionHouse.filter(x => x);
     },
-    getHighHouse: function(arrData, price) {
+    getHighHouse: function (arrData, price) {
         billionHouse = arrData.map(element => {
-            if(element.priceInf.trim().indexOf("tỷ") > 0) {
-                if(!price) {
+            if (element.priceInf.trim().indexOf("tỷ") > 0) {
+                if (!price) {
                     return element;
                 }
-                if(price == 5 && parseInt(element.priceInf.trim().slice(0,-3).replace(',','.')) >= price) return element;
-                if(element.priceInf.trim().slice(0,-3).replace(',','.') >= price-1 && element.priceInf.trim().slice(0,-3).replace(',','.') <= price && parseInt(element.priceInf.trim().slice(0,-3).replace(',','.')) < 10)
-                return element;
+                if (price == 5 && parseInt(element.priceInf.trim().slice(0, -3).replace(',', '.')) >= price) return element;
+                if (element.priceInf.trim().slice(0, -3).replace(',', '.') >= price - 1 && element.priceInf.trim().slice(0, -3).replace(',', '.') <= price && parseInt(element.priceInf.trim().slice(0, -3).replace(',', '.')) < 10)
+                    return element;
             }
         });
         return billionHouse.filter(x => x);
     },
-    getRateHouse: function(arrData) {
+    getRateHouse: function (arrData) {
         dataApp.get('/lessor/rate-house', (request, response) => {
             let result = [];
-            if(request.query.data) {
-                if(request.query.data == 1) {
+            if (request.query.data) {
+                if (request.query.data == 1) {
                     result = [...this.getLowHouse(arrData)].filter(element => this.getAreaValue(arrData, request.query.area).includes(element));
                     result = result.filter(element => this.getProvinceValue(arrData, request.query.province).includes(element));
                     result = result.filter(element => this.getDictrictValue(arrData, request.query.district).includes(element));
                     response.send(result);
                 }
-                
-                if(request.query.data > 1) {
+
+                if (request.query.data > 1) {
                     result = [...this.getHighHouse(arrData, request.query.data)].filter(element => this.getAreaValue(arrData, request.query.area).includes(element));
                     result = result.filter(element => this.getProvinceValue(arrData, request.query.province).includes(element));
                     result = result.filter(element => this.getDictrictValue(arrData, request.query.district).includes(element));
@@ -86,76 +86,76 @@ var lessor = {
                 }
             }
             else {
-                result = [...this.getHighHouse(arrData,0), ...this.getLowHouse(arrData)].filter(element => this.getAreaValue(arrData, request.query.area).includes(element));
+                result = [...this.getHighHouse(arrData, 0), ...this.getLowHouse(arrData)].filter(element => this.getAreaValue(arrData, request.query.area).includes(element));
                 result = result.filter(element => this.getProvinceValue(arrData, request.query.province).includes(element));
                 result = result.filter(element => this.getDictrictValue(arrData, request.query.district).includes(element));
                 response.send(result);
             }
         });
     },
-    getAreaValue: function(arrData, areaValue) {
-        if(!!!areaValue) {
+    getAreaValue: function (arrData, areaValue) {
+        if (!!!areaValue) {
             return arrData;
         }
 
         const init = areaValue.indexOf("-");
         const sizeValue = {
             low: parseInt(areaValue.substring(0, init)),
-            high: parseInt(areaValue.substring(init+1, areaValue.length))
+            high: parseInt(areaValue.substring(init + 1, areaValue.length))
         }
         let areaData = arrData.map(el => {
-            initValue = parseInt(el.areaInf.substring(0, el.areaInf.length - 3).replace('.',''));
-            if(initValue >= sizeValue.low && initValue <= sizeValue.high) {
-                
+            initValue = parseInt(el.areaInf.substring(0, el.areaInf.length - 3).replace('.', ''));
+            if (initValue >= sizeValue.low && initValue <= sizeValue.high) {
+
                 return el;
             }
         })
         return areaData.filter(x => x);
     },
-    getProvinceValue: function(arrData, provinceValue) {
-        if(!!!provinceValue) return arrData;
+    getProvinceValue: function (arrData, provinceValue) {
+        if (!!!provinceValue) return arrData;
         let data = arrData.map(el => {
-            if(el.addressInf.indexOf(provinceValue) > 0) {
+            if (el.addressInf.indexOf(provinceValue) > 0) {
                 return el;
             }
         });
         return data;
     },
-    getDictrictValue: function(arrData, dictrictValue) {
-        if(!!!dictrictValue) return arrData;
+    getDictrictValue: function (arrData, dictrictValue) {
+        if (!!!dictrictValue) return arrData;
         let data = arrData.map(el => {
-            if(el.addressInf.indexOf(dictrictValue)>0) {
+            if (el.addressInf.indexOf(dictrictValue) > 0) {
                 return el;
             }
         })
         return data;
     },
-    getValueByProvince: function(arrData) {
+    getValueByProvince: function (arrData) {
         dataApp.get('/lessor/value-search-province', (request, response) => {
             const init = this.getProvinceValue(arrData, request.query.province).filter(x => x);
             const countData = this.countData(init);
             response.send(countData)
         })
     },
-    countRateArea: function(arrData) {
-        let dataPercent = Array.apply(null, Array(5)).map(Number.prototype.valueOf,0);
+    countRateArea: function (arrData) {
+        let dataPercent = Array.apply(null, Array(5)).map(Number.prototype.valueOf, 0);
         dataPercent.fill(0);
         dataPercent[0] = this.getLowHouse(arrData).length;
 
         arrData.map(element => {
-            if(element.priceInf.trim().indexOf("tỷ") > 0) {
-                const init = parseFloat(element.priceInf.trim().slice(0,-3).replace(',','.'));
-                if(init>=1 && init<=2) dataPercent[1]++;
-                else if(init>=2 && init<=3) dataPercent[2]++;
-                else if(init>=3 && init<=4) dataPercent[3]++;
-                else if(init>=4) dataPercent[4]++;
+            if (element.priceInf.trim().indexOf("tỷ") > 0) {
+                const init = parseFloat(element.priceInf.trim().slice(0, -3).replace(',', '.'));
+                if (init >= 1 && init <= 2) dataPercent[1]++;
+                else if (init >= 2 && init <= 3) dataPercent[2]++;
+                else if (init >= 3 && init <= 4) dataPercent[3]++;
+                else if (init >= 4) dataPercent[4]++;
             }
         });
         const sumArea = dataPercent;
-        dataPercent = dataPercent.map(el => (el*100)/ arrData.length);
+        dataPercent = dataPercent.map(el => (el * 100) / arrData.length);
         return { dataPercent: dataPercent, sumHouses: sumArea }
     },
-    getRateArea: function(arrData) {
+    getRateArea: function (arrData) {
         dataApp.get('/lessor/price-data', (request, response) => {
             const init = this.getProvinceValue(arrData, request.query.province).filter(x => x);
             const countData = this.countRateArea(init);
@@ -163,42 +163,42 @@ var lessor = {
         });
     },
 
-    identicalPrice: function(arrData) {
+    identicalPrice: function (arrData) {
         dataApp.get('/lessor/identical-price', (request, response) => {
             //25/10  1/11  8/11  15/11  19/11
             const arrFilteredProvince_Week1 = this.getRequestByDateAndProvince(arrData, "25/10/2021", request.query.province, request.query.district)
-            const averageValue_Week1 =  this.filterDataPircePerArea(arrFilteredProvince_Week1);
+            const averageValue_Week1 = this.filterDataPircePerArea(arrFilteredProvince_Week1);
 
             const arrFilteredProvince_Week2 = this.getRequestByDateAndProvince(arrData, "1/11/2021", request.query.province, request.query.district)
-            const averageValue_Week2 =  this.filterDataPircePerArea(arrFilteredProvince_Week2);
+            const averageValue_Week2 = this.filterDataPircePerArea(arrFilteredProvince_Week2);
 
             const arrFilteredProvince_Week3 = this.getRequestByDateAndProvince(arrData, "8/11/2021", request.query.province, request.query.district)
-            const averageValue_Week3 =  this.filterDataPircePerArea(arrFilteredProvince_Week3);
-            
+            const averageValue_Week3 = this.filterDataPircePerArea(arrFilteredProvince_Week3);
+
             const arrFilteredProvince_Week4 = this.getRequestByDateAndProvince(arrData, "15/11/2021", request.query.province, request.query.district)
-            const averageValue_Week4 =  this.filterDataPircePerArea(arrFilteredProvince_Week4);
-            
+            const averageValue_Week4 = this.filterDataPircePerArea(arrFilteredProvince_Week4);
+
             const arrFilteredProvince_Week5 = this.getRequestByDateAndProvince(arrData, "19/11/2021", request.query.province, request.query.district)
-            const averageValue_Week5 =  this.filterDataPircePerArea(arrFilteredProvince_Week5);
+            const averageValue_Week5 = this.filterDataPircePerArea(arrFilteredProvince_Week5);
 
             const arrResult = [averageValue_Week1, averageValue_Week2, averageValue_Week3, averageValue_Week4, averageValue_Week5]
             response.send([...arrResult, this.futurePrice(arrResult)]);
         });
     },
     getRequestByDateAndProvince(rootValue, date, province, district) {
-        if(district) {
-            return result = rootValue.filter(el => el.postDate == date && el.addressInf.indexOf(province) > 0 && el.addressInf.indexOf(district) > 0) 
+        if (district) {
+            return result = rootValue.filter(el => el.postDate == date && el.addressInf.indexOf(province) > 0 && el.addressInf.indexOf(district) > 0)
         } else {
             return result = rootValue.filter(el => el.postDate == date && el.addressInf.indexOf(province) > 0)
         }
     },
     filterDataPircePerArea(dataFilter) {
         let pricePerArea = dataFilter.map(el => {
-            if(el.priceInf.trim().indexOf("triệu") > 0) {
+            if (el.priceInf.trim().indexOf("triệu") > 0) {
                 const priceTotal = parseFloat(Number(el.priceInf.trim().slice(0, -13).replace(',', '.')));
-                const areaTotal = parseInt(el.areaInf.substring(0, el.areaInf.length - 3).replace('.',''))
-                
-                return (priceTotal * 1000)/areaTotal;
+                const areaTotal = parseInt(el.areaInf.substring(0, el.areaInf.length - 3).replace('.', ''))
+
+                return (priceTotal * 1000) / areaTotal;
             }
         }).filter(el => el);
         const average = pricePerArea.reduce((p, c) => p + c, 0) / pricePerArea.length;
@@ -207,6 +207,6 @@ var lessor = {
     futurePrice(arrResult) {
         return (arrResult.reduce((p, c) => Number(p) + Number(c), 0) / arrResult.length).toFixed(1)
     },
-    
+
 }
 module.exports = lessor;
