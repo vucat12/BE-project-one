@@ -4,30 +4,29 @@ const AccountModel = require('./account');
 var jwt = require('jsonwebtoken');
 
 dataApp.use(bodyParser.urlencoded({ extended: false })),
-dataApp.use(bodyParser.json()),
+    dataApp.use(bodyParser.json()),
 
-module.exports = function SignIn() {
-    dataApp.post('/login', (req, res) => {
-        var username = req.body.username;
-        var password = req.body.password;
-        AccountModel.findOne({
-            username: username,
-            password: password
+    module.exports = function SignIn() {
+        dataApp.post('/login', (req, res) => {
+            var username = req.body.username;
+            var password = req.body.password;
+            AccountModel.findOne({
+                username: username,
+                password: password
+            })
+                .then(data => {
+                    const token = jwt.sign({ user: data }, 'token_authen')
+                    if (data) {
+                        res.json(token)
+                    }
+                    else {
+                        res.status(400).json('Đăng nhập thất bại')
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                    res.status(500).json('Lỗi server')
+                })
         })
-        
-        .then(data => {
-            const token = jwt.sign({user: data}, 'token_authen')
-            if (data) {
-                res.json(token)
-            }
-            else {
-                res.status(400).json('Đăng nhập thất bại')
-            }
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json('Lỗi server')
-        })
-        })
-}
+    }
 

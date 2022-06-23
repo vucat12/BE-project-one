@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/DoAn1', {
+mongoose.connect('mongodb://localhost/DoAn2', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -7,11 +7,11 @@ mongoose.connect('mongodb://localhost/DoAn1', {
 const Schema = mongoose.Schema;
 
 const AccountSchema = new Schema({
-    username: String,
-    password: String,
-    email: String,
+  username: String,
+  password: String,
+  email: String,
 }, {
-    collection: 'account'
+  collection: 'account'
 });
 
 const AccountModel = mongoose.model('account', AccountSchema)
